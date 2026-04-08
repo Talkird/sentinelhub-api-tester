@@ -1,0 +1,18 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Image {
+  id      Int @id @default(autoincrement())
+  data    String
+  mimeType String
+  createdAt DateTime @default(now())
+  startDate DateTime
+  endDate DateTime
+}

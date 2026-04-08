@@ -1,27 +1,11 @@
 <script setup lang="ts">
-import type { Image } from "~/server/types";
+import type Image from "~~/server/utils/types";
+
 const toast = useToast();
-const images = ref<Image[]>([]);
 const start_date = ref("2024-01-01");
 const end_date = ref("2024-01-31");
 
-const fetchImages = async () => {
-  try {
-    const response = await $fetch("/api/images");
-    images.value = response.images;
-  } catch (error) {
-    console.error("Error fetching images:", error);
-    toast.add({
-      title: "Error",
-      description: "Failed to fetch images.",
-      color: "error",
-    });
-  }
-};
-
-onMounted(() => {
-  fetchImages();
-});
+const { data: images, refresh } = await useFetch<Image[]>("/api/images");
 
 const saveImage = async () => {
   try {
@@ -32,12 +16,13 @@ const saveImage = async () => {
         endDate: end_date.value,
       },
     });
+    await refresh();
+
     toast.add({
       title: "Success",
       description: "Image saved successfully.",
       color: "success",
     });
-    fetchImages();
   } catch (error) {
     console.error("Error:", error);
     toast.add({
@@ -54,7 +39,7 @@ const saveImage = async () => {
     <div class="max-w-6xl mx-auto">
       <UCard class="mb-8">
         <p class="text-sm mb-4">
-          Sentinel Hub Request Builder:
+          Sentinel Hub:
           <ULink
             class="text-primary hover:underline transition"
             to="https://insights.planet.com/analyze/requests-builder/"
@@ -92,11 +77,12 @@ const saveImage = async () => {
         <ImgCard
           v-for="image in images"
           :key="image.id"
-          :url="image.url"
-          :filename="image.filename"
-          :date="image.date"
-          :size="image.size"
           :id="image.id"
+          :data="image.data"
+          :mimeType="image.mimeType"
+          :createdAt="image.createdAt"
+          :startDate="image.startDate"
+          :endDate="image.endDate"
         />
       </div>
     </div>

@@ -1,12 +1,9 @@
-import fs from "fs";
-import path from "path";
-import { fetchSentinelHubImage, trainingDataDir } from "../utils/sentinel-hub";
-import { Image } from "../types";
+import { fetchSentinelHubImage } from "../utils/sentinel-hub";
+import Image from "../utils/types";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const startDate = body?.startDate;
-  const endDate = body?.endDate;
+  const { startDate, endDate } = body;
 
   if (!startDate || !endDate) {
     throw createError({
@@ -15,22 +12,29 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { buffer, timestamp } = await fetchSentinelHubImage(startDate, endDate);
+  try {
+    const { buffer } = await fetchSentinelHubImage(startDate, endDate);
 
-  const filename = `sentinel-hub-${timestamp}.jpg`;
-  const filepath = path.join(trainingDataDir, filename);
+    const base64String = buffer.toString("base64");
+    const filename = `sentinel-hub-${startDate}-to-${endDate}.jpg`;
+    const mimeType = "image/jpeg";
 
-  fs.writeFileSync(filepath, buffer);
-  const stats = fs.statSync(filepath);
+    const image = await prisma.image.create({
+      data: {
+        data: base64String,
+        mimeType,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+      },
+    });
 
-  const image: Image = {
-    filename,
-    size: stats.size,
-    url: `/training_data/${filename}`,
-    date: new Date(stats.mtime).toLocaleString(),
-  };
-
-  return {
-    image,
-  };
+    return {
+      success: true,
+    };
+  } catch (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: `Failed to fetch and store image: ${error instanceof Error ? error.message : "Unknown error"}`,
+    });
+  }
 });

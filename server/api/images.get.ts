@@ -1,30 +1,10 @@
-import fs from "fs";
-import path from "path";
-import { trainingDataDir } from "../utils/sentinel-hub";
-import { Image } from "../types";
+import Image from "../utils/types";
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   try {
-    const files = fs
-      .readdirSync(trainingDataDir)
-      .filter((file) => file.toLowerCase().endsWith(".jpg"))
-      .sort();
+    const images = await prisma.image.findMany();
 
-    const images: Image[] = files.map((file) => {
-      const filepath = path.join(trainingDataDir, file);
-      const stats = fs.statSync(filepath);
-      return {
-        id: file,
-        filename: file,
-        url: `/training_data/${file}`,
-        size: stats.size,
-        date: new Date(stats.mtime).toLocaleString(),
-      };
-    }); 
-
-    return {
-      images,
-    };
+    return images;
   } catch (error) {
     console.error("Error reading images:", error);
     throw createError({
