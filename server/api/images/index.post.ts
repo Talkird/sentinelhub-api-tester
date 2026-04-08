@@ -1,10 +1,12 @@
-import { fetchSentinelHubImage } from "../utils/sentinel-hub";
-import Image from "../utils/types";
+import { fetchSentinelHubImage } from "../../utils/sentinel-hub";
+import Image from "../../utils/types";
+import dateSchema from "~/utils/schemas";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
+  const body = await readValidatedBody(event, dateSchema.parse);
   const { startDate, endDate } = body;
 
+  //Check if startDate and endDate are provided
   if (!startDate || !endDate) {
     throw createError({
       statusCode: 400,
@@ -12,14 +14,21 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  //Check if startDate is before endDate
+  if (startDate >= endDate) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "startDate must be before endDate.",
+    });
+  }
+
   try {
     const { buffer } = await fetchSentinelHubImage(startDate, endDate);
 
     const base64String = buffer.toString("base64");
-    const filename = `sentinel-hub-${startDate}-to-${endDate}.jpg`;
     const mimeType = "image/jpeg";
 
-    const image = await prisma.image.create({
+    const image: Image = await prisma.image.create({
       data: {
         data: base64String,
         mimeType,
@@ -29,6 +38,7 @@ export default defineEventHandler(async (event) => {
     });
 
     return {
+      image,
       success: true,
     };
   } catch (error) {

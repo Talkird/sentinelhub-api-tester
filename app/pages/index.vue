@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type Image from "~~/server/utils/types";
+import dateSchema from "~/utils/schemas";
 
 const toast = useToast();
 const start_date = ref("2024-01-01");
 const end_date = ref("2024-01-31");
+
+const formState = reactive({
+  startDate: "2024-01-01",
+  endDate: "2024-01-31",
+});
 
 const { data: images, refresh } = await useFetch<Image[]>("/api/images");
 
@@ -49,25 +55,36 @@ const saveImage = async () => {
           </ULink>
         </p>
 
-        <div class="flex-col md:flex-row flex gap-4 mb-4">
-          <UInput
-            type="text"
-            placeholder="Start Date (YYYY-MM-DD)"
-            v-model="start_date"
-          />
-          <UInput
-            type="text"
-            placeholder="End Date (YYYY-MM-DD)"
-            v-model="end_date"
-          />
-        </div>
-        <UButton
-          @click="saveImage"
-          class="font-medium w-full sm:w-auto"
-          loading-auto
+        <UForm
+          @submit="saveImage"
+          :schema="dateSchema"
+          :state="formState"
+          class="flex-col flex gap-4 mb-4"
         >
-          Save Image
-        </UButton>
+          <div class="flex flex-col md:flex-row gap-4">
+            <UFormField label="Start date">
+              <UInput
+                type="text"
+                placeholder="Start Date (YYYY-MM-DD)"
+                v-model="start_date"
+              />
+            </UFormField>
+            <UFormField label="End date">
+              <UInput
+                type="text"
+                placeholder="End Date (YYYY-MM-DD)"
+                v-model="end_date"
+              />
+            </UFormField>
+          </div>
+          <UButton
+            type="submit"
+            class="font-medium w-full sm:w-fit text-center justify-center"
+            loading-auto
+          >
+            Save Image
+          </UButton>
+        </UForm>
       </UCard>
 
       <div
@@ -83,6 +100,7 @@ const saveImage = async () => {
           :createdAt="image.createdAt"
           :startDate="image.startDate"
           :endDate="image.endDate"
+          @image-deleted="refresh"
         />
       </div>
     </div>
