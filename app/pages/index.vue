@@ -41,7 +41,7 @@ const saveImage = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen p-8">
+  <div class="min-h-screen p-8 bg-neutral-100 dark:bg-neutral-800">
     <div class="max-w-6xl mx-auto">
       <UCard class="mb-8">
         <p class="text-sm mb-4">
