@@ -124,7 +124,7 @@ const saveImage = async () => {
                 v-model="end_date"
               />
             </UFormField>
-            <UFormField label="Región">
+            <UFormField label="Region">
               <USelect
                 class="w-48"
                 v-model="selectValue"

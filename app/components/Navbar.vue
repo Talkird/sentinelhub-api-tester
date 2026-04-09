@@ -4,13 +4,13 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: "Sentinel Hub",
-    icon: "i-lucide-satellite",
+    icon: "i-lucide-satellite-dish",
     to: "https://www.sentinel-hub.com/",
     target: "_blank",
   },
   {
     label: "GitHub",
-    icon: "i-simple-icons-github",
+    icon: "i-lucide-github",
     to: "https://github.com/Talkird/sentinelhub-api-tester",
     target: "_blank",
   },
