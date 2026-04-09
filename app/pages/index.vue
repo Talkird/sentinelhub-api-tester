@@ -1,15 +1,73 @@
 <script setup lang="ts">
 import type Image from "~~/server/utils/types";
-import dateSchema from "~/utils/schemas";
+import type { SelectItem } from "#ui/types";
+import { dateSchema } from "~/utils/schemas";
 
 const toast = useToast();
 const start_date = ref("2024-01-01");
 const end_date = ref("2024-01-31");
+const selectValue = ref("capillaDelMonte");
 
 const formState = reactive({
   startDate: "2024-01-01",
   endDate: "2024-01-31",
 });
+
+const selectItems = ref<SelectItem[]>([
+  {
+    label: "Capilla del Monte",
+    value: "capillaDelMonte",
+  },
+  {
+    label: "Sierras de Córdoba",
+    value: "sierrasDeCordoba",
+  },
+  {
+    label: "Norte de San Luis",
+    value: "norteSanLuis",
+  },
+
+  {
+    label: "El Bolsón, Lago Puelo",
+    value: "elBolsonLagoPuelo",
+  },
+  {
+    label: "Puerto Patriada",
+    value: "puertoPatriada",
+  },
+  {
+    label: "Cushamen",
+    value: "cushamen",
+  },
+  {
+    label: "Parque Los Alerces",
+    value: "parqueLosAlerces",
+  },
+  {
+    label: "Delta del Paraná",
+    value: "deltaDelParana",
+  },
+  {
+    label: "Esteros del Iberá",
+    value: "esterosDelIbera",
+  },
+  {
+    label: "Norte Corrientes",
+    value: "norteCorrientes",
+  },
+  {
+    label: "Gran Chaco Argentino",
+    value: "granChacoArgentino",
+  },
+  {
+    label: "Selva Pedemontana Salta",
+    value: "selvaPedemontanaSalta",
+  },
+  {
+    label: "Centro La Pampa",
+    value: "centroLaPampa",
+  },
+]);
 
 const { data: images, refresh } = await useFetch<Image[]>("/api/images");
 
@@ -20,6 +78,7 @@ const saveImage = async () => {
       body: {
         startDate: start_date.value,
         endDate: end_date.value,
+        region: selectValue.value,
       },
     });
     await refresh();
@@ -44,17 +103,6 @@ const saveImage = async () => {
   <div class="min-h-screen p-8 bg-neutral-100 dark:bg-neutral-800">
     <div class="max-w-6xl mx-auto">
       <UCard class="mb-8">
-        <p class="text-sm mb-4">
-          Sentinel Hub:
-          <ULink
-            class="text-primary hover:underline transition"
-            to="https://insights.planet.com/analyze/requests-builder/"
-            target="_blank"
-          >
-            Request Builder
-          </ULink>
-        </p>
-
         <UForm
           @submit="saveImage"
           :schema="dateSchema"
@@ -74,6 +122,13 @@ const saveImage = async () => {
                 type="text"
                 placeholder="End Date (YYYY-MM-DD)"
                 v-model="end_date"
+              />
+            </UFormField>
+            <UFormField label="Región">
+              <USelect
+                class="w-48"
+                v-model="selectValue"
+                :items="selectItems"
               />
             </UFormField>
           </div>

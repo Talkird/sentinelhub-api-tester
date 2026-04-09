@@ -78,6 +78,7 @@ export const getAccessToken = async (): Promise<string> => {
 export const fetchSentinelHubImage = async (
   startDate: string,
   endDate: string,
+  boundingBox: number[],
 ): Promise<{ buffer: Buffer; timestamp: number }> => {
   const token = await getAccessToken();
 
@@ -85,7 +86,7 @@ export const fetchSentinelHubImage = async (
     input: {
       bounds: {
         properties: { crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84" },
-        bbox: BBOX_CORDOBA,
+        bbox: boundingBox,
       },
       data: [
         {
