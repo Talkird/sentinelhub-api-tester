@@ -112,6 +112,7 @@ const saveImage = async () => {
           <div class="flex flex-col md:flex-row gap-4">
             <UFormField label="Start date">
               <UInput
+                class="w-full sm:w-fit"
                 type="text"
                 placeholder="Start Date (YYYY-MM-DD)"
                 v-model="start_date"
@@ -119,6 +120,7 @@ const saveImage = async () => {
             </UFormField>
             <UFormField label="End date">
               <UInput
+                class="w-full sm:w-fit"
                 type="text"
                 placeholder="End Date (YYYY-MM-DD)"
                 v-model="end_date"
@@ -126,7 +128,7 @@ const saveImage = async () => {
             </UFormField>
             <UFormField label="Region">
               <USelect
-                class="w-48"
+                class="w-full sm:w-fit"
                 v-model="selectValue"
                 :items="selectItems"
               />
